@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISSO INGENIERÍA - Panel Administrativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+
+    <div id="pantalla-login" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+            <div class="w-12 h-12 bg-teal-500/10 text-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-teal-500/20">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-1">Acceso Administrativo</h2>
+            <p class="text-xs text-slate-400 mb-5">SISSO INGENIERÍA - Área Privada</p>
+            
+            <div class="space-y-3">
+                <input type="password" id="input-password" placeholder="Introduzca la clave maestra" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-slate-100 font-semibold focus:outline-none focus:border-teal-500 transition-all">
+                <button id="btn-login" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-950/20">
+                    Verificar Identidad
+                </button>
+                <p id="error-login" class="text-xs text-rose-500 font-semibold hidden">⚠️ Clave incorrecta. Acceso denegado.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="contenido-panel" class="max-w-6xl mx-auto hidden">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-teal-400">Panel Central de Monitoreo</span>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight text-white">SISSO INGENIERÍA</h1>
+                <p class="text-xs text-slate-400 mt-0.5">Control de Asistencia, Liquidación de Salarios y Ubicación en Tiempo Real</p>
+            </div>
+            <button id="btn-exportar" class="w-full md:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Descargar Reporte Excel
+            </button>
+        </header>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+                <h2 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Historial Reciente de Marcaciones</h2>
+                <span id="contador-registros" class="text-xs bg-slate-950 border border-slate-700 px-3 py-1 rounded-full text-teal-400 font-medium">0 marcas registradas</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="tabla-marcaciones">
+                    <thead>
+                        <tr class="bg-slate-950/60 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
+                            <th class="p-4">Colaborador</th>
+                            <th class="p-4">Fecha</th>
+                            <th class="p-4">Hora</th>
+                            <th class="p-4">Evento</th>
+                            <th class="p-4">Cálculo de Jornada</th>
+                            <th class="p-4 text-center">Ubicación (GPS)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-cuerpo" class="divide-y divide-slate-700/50 text-sm font-medium">
+                        <tr id="fila-vacia">
+                            <td colspan="6" class="p-8 text-center text-slate-500 italic">Esperando marcaciones...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+        // Cambia 'admin123' por la contraseña que quieras usar
+        const CLAVE_MAESTRA = "admin123";
+
+        const pantallaLogin = document.getElementById('pantalla-login');
+        const contenidoPanel = document.getElementById('contenido-panel');
+        const inputPassword = document.getElementById('input-password');
+        const btnLogin = document.getElementById('btn-login');
+        const errorLogin = document.getElementById('error-login');
+
+        function verificarAcceso() {
+            if (inputPassword.value === CLAVE_MAESTRA) {
+                pantallaLogin.classList.add('hidden');
+                contenidoPanel.classList.remove('hidden');
+                conectarFirebase();
+            } else {
+                errorLogin.classList.remove('hidden');
+                inputPassword.value = "";
+            }
+        }
+
+        btnLogin.addEventListener('click', verificarAcceso);
+        inputPassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') verificarAcceso(); });
+
+        function conectarFirebase() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyB9OPdG6MHHcs6NbIg9bBBDnmTJyquG9wg",
+                authDomain: "marcacion-insso.firebaseapp.com",
+                databaseURL: "https://marcacion-insso-default-rtdb.firebaseio.com/",
+                projectId: "marcacion-insso",
+                storageBucket: "marcacion-insso.firebasestorage.app",
+                messagingSenderId: "116053257095",
+                appId: "1:116053257095:web:647eb8bc92e6bdde010122",
+                measurementId: "G-5XSG9VZRS4"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            const tablaCuerpo = document.getElementById('tabla-cuerpo');
+            const contadorRegistros = document.getElementById('contador-registros');
+            let todasLasMarcaciones = [];
+
+            const marcacionesRef = ref(db, 'marcaciones_sisso');
+            onValue(marcacionesRef, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                tablaCuerpo.innerHTML = "";
+                const lista = [];
+                Object.keys(data).forEach(id => { lista.push({ id, ...data[id] }); });
+                lista.sort((a, b) => b.timestamp - a.timestamp);
+                todasLasMarcaciones = lista;
+
+                contadorRegistros.innerText = `${lista.length} marcas registradas`;
+
+                lista.forEach((marcacion) => {
+                    const fila = document.createElement('tr');
+                    fila.className = "hover:bg-slate-800/40 transition-colors";
+
+                    const esEntrada = marcacion.tipo === "ENTRADA";
+                    const badgeTipo = esEntrada 
+                        ? `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide">🛫 ENTRADA</span>`
+                        : `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide">🛬 SALIDA</span>`;
+
+                    let columnaGps = `<span class="text-slate-500 italic text-xs">Sin señal</span>`;
+                    if (marcacion.coordenadas) {
+                        columnaGps = `
+                            <div class="flex justify-center">
+                                <a href="https://maps.google.com/?q=${marcacion.coordenadas}" target="_blank" class="inline-flex items-center gap-1 bg-slate-700/60 hover:bg-slate-700 text-teal-400 hover:text-teal-300 px-3 py-1.5 rounded-lg border border-slate-600 transition-all text-xs">
+                                    Ver en Google Maps
+                                </a>
+                            </div>`;
+                    }
+
+                    let calculoJornada = `<span class="text-slate-500 text-xs">—</span>`;
+                    if (!esEntrada) {
+                        const entrada = lista.find(m => m.empleado === marcacion.empleado && m.fecha === marcacion.fecha && m.tipo === "ENTRADA" && m.timestamp < marcacion.timestamp);
+                        if (entrada) {
+                            const totalHoras = ((marcacion.timestamp - entrada.timestamp) / (1000 * 60 * 60)).toFixed(2);
+                            calculoJornada = `<span class="text-teal-400 font-bold bg-teal-500/5 border border-teal-500/10 px-2 py-1 rounded-md text-xs">⏱ ${totalHoras} hrs</span>`;
+                        } else {
+                            calculoJornada = `<span class="text-amber-500 font-semibold text-xs">⚠️ Sin Entrada</span>`;
+                        }
+                    } else {
+                        calculoJornada = `<span class="text-slate-400 text-xs">Turno abierto...</span>`;
+                    }
+
+                    fila.innerHTML = `
+                        <td class="p-4 font-semibold text-slate-200">${marcacion.empleado}</td>
+                        <td class="p-4 text-slate-300 font-medium">${marcacion.fecha}</td>
+                        <td class="p-4 text-slate-300 font-mono">${marcacion.hora}</td>
+                        <td class="p-4">${badgeTipo}</td>
+                        <td class="p-4">${calculoJornada}</td>
+                        <td class="p-4 text-center">${columnaGps}</td>
+                    `;
+                    tablaCuerpo.appendChild(fila);
+                });
+            });
+
+            document.getElementById('btn-exportar').addEventListener('click', () => {
+                if (todasLasMarcaciones.length === 0) return;
+                const filasExcel = todasLasMarcaciones.map(m => ({
+                    'Colaborador': m.empleado, 'Empresa': m.empresa, 'Fecha': m.fecha, 'Hora': m.hora, 'Tipo': m.tipo, 'GPS': m.coordenadas
+                }));
+                const hoja = XLSX.utils.json_to_sheet(filasExcel);
+                const libro = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(libro, hoja, "Marcaciones");
+                XLSX.writeFile(libro, `Asistencia_SISSO.xlsx`);
+            });
+        }
+    </script>
+</body>
+</html>
