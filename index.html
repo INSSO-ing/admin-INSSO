@@ -6,54 +6,13 @@
     <title>INSSO Admin</title>
 
     <!-- ============================================================
-         PWA - MANIFEST EMBEBIDO (en línea)
+         PWA - MANIFEST (archivo físico)
          ============================================================ -->
-    <script>
-        (function() {
-            const manifest = {
-                "name": "INSSO Admin - Panel de Control",
-                "short_name": "INSSO Admin",
-                "description": "Panel de control de asistencia y marcaciones INSSO",
-                "start_url": "index.html",
-                "display": "standalone",
-                "background_color": "#0f172a",
-                "theme_color": "#0f172a",
-                "orientation": "portrait",
-                "icons": [
-                    {
-                        "src": "logo-insso.png",
-                        "sizes": "192x192",
-                        "type": "image/png",
-                        "purpose": "any"
-                    },
-                    {
-                        "src": "logo-insso.png",
-                        "sizes": "512x512",
-                        "type": "image/png",
-                        "purpose": "any"
-                    },
-                    {
-                        "src": "logo-insso.png",
-                        "sizes": "192x192",
-                        "type": "image/png",
-                        "purpose": "maskable"
-                    }
-                ]
-            };
-            
-            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = url;
-            document.head.appendChild(link);
-        })();
-    </script>
-
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="INSSO Admin">
-    <meta name="theme-color" content="#0f172a">
     
     <link rel="icon" type="image/png" href="logo-insso.png">
     <link rel="apple-touch-icon" href="logo-insso.png">
@@ -613,7 +572,7 @@
         }
 
         // ============================================================
-        // PWA - INSTALACIÓN
+        // PWA - INSTALACIÓN (CORREGIDO)
         // ============================================================
         let deferredPrompt = null;
         const installBanner = document.getElementById('installBanner');
@@ -621,32 +580,41 @@
         const btnCloseInstall = document.getElementById('btnCloseInstall');
         const installFloatBtn = document.getElementById('installFloatBtn');
 
+        // Ocultar si ya está instalada
         if (window.matchMedia('(display-mode: standalone)').matches) {
             installBanner.style.display = 'none';
             installFloatBtn.style.display = 'none';
         }
 
+        // Detectar evento de instalación
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             installBanner.classList.add('show');
+            console.log('✅ beforeinstallprompt detectado');
         });
 
+        // Función de instalación
         async function instalarApp() {
             if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const result = await deferredPrompt.userChoice;
-                if (result.outcome === 'accepted') {
-                    installBanner.classList.remove('show');
-                    installFloatBtn.style.display = 'none';
+                try {
+                    deferredPrompt.prompt();
+                    const result = await deferredPrompt.userChoice;
+                    console.log('Resultado instalación:', result.outcome);
+                    if (result.outcome === 'accepted') {
+                        installBanner.classList.remove('show');
+                        installFloatBtn.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                } catch (error) {
+                    console.error('Error al instalar:', error);
                 }
-                deferredPrompt = null;
             } else {
                 const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 if (esIOS) {
                     alert("📱 Para instalar en iPhone:\n\n1. Presiona el botón 'Compartir' (cuadro con flecha)\n2. Desliza hacia abajo y selecciona 'Añadir a la pantalla de inicio'\n3. Presiona 'Añadir'");
                 } else {
-                    alert("📱 Para instalar, abre esta página en Chrome y selecciona 'Instalar aplicación' en el menú de 3 puntos.\n\nO desde el menú del navegador, elige 'Añadir a la pantalla de inicio'.");
+                    alert("📱 Para instalar:\n\n1. Abre esta página en Chrome en tu celular\n2. Presiona los 3 puntitos (⋮) en la esquina superior derecha\n3. Selecciona 'Instalar aplicación' o 'Añadir a la pantalla de inicio'\n\n⚠️ Si no ves la opción, asegúrate de tener el archivo manifest.json en la misma carpeta.");
                 }
             }
         }
@@ -658,33 +626,52 @@
             installBanner.classList.remove('show');
         });
 
+        // Cuando se instala correctamente
         window.addEventListener('appinstalled', () => {
+            console.log('✅ App instalada correctamente');
             installBanner.classList.remove('show');
             installFloatBtn.style.display = 'none';
         });
 
         // ============================================================
-        // SERVICE WORKER - REGISTRO AUTOMÁTICO
+        // SERVICE WORKER
         // ============================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                // Registrar un Service Worker simple (puedes crear sw.js aparte o usar este)
-                const swCode = `
-                    self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-                    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                    self.addEventListener('fetch', e => {
-                        e.respondWith(
-                            caches.match(e.request).then(r => r || fetch(e.request))
-                        );
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker INSSO Admin registrado:', registration);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error al registrar Service Worker:', error);
+                        // Si no existe sw.js, crearlo automáticamente
+                        crearSWFallback();
                     });
-                `;
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(() => console.log('✅ Service Worker registrado'))
-                    .catch(() => console.log('❌ Error SW'));
             });
+        }
+
+        // Fallback: crear SW automáticamente si no existe
+        function crearSWFallback() {
+            const swCode = `
+                self.addEventListener('install', e => {
+                    e.waitUntil(self.skipWaiting());
+                });
+                self.addEventListener('activate', e => {
+                    e.waitUntil(self.clients.claim());
+                });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(
+                        fetch(e.request).catch(() => {
+                            return caches.match(e.request);
+                        })
+                    );
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl)
+                .then(() => console.log('✅ Service Worker fallback registrado'))
+                .catch(() => console.log('❌ Error SW fallback'));
         }
 
         // ============================================================
