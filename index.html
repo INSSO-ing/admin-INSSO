@@ -6,7 +6,7 @@
     <title>INSSO Admin</title>
 
     <!-- ============================================================
-         PWA - MANIFEST EMBEBIDO
+         PWA - MANIFEST EMBEBIDO (IGUAL QUE EXTINTORES)
          ============================================================ -->
     <script>
         (function() {
@@ -66,8 +66,10 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
 
-        /* ===== BANNER DE INSTALACIÓN PWA ===== */
-        #installBanner {
+        /* ============================================================
+           BANNER DE INSTALACIÓN PWA (IGUAL QUE EXTINTORES)
+           ============================================================ */
+        .install-banner {
             display: none;
             position: fixed;
             bottom: 0;
@@ -75,68 +77,69 @@
             right: 0;
             background: linear-gradient(135deg, #0f172a, #1e293b);
             color: white;
-            padding: 16px 20px;
-            z-index: 9999;
+            padding: 16px 24px;
+            z-index: 999;
             box-shadow: 0 -4px 30px rgba(0,0,0,0.4);
+            animation: slideUp 0.5s ease-out;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
             flex-wrap: wrap;
             border-top: 3px solid #f59e0b;
         }
-        #installBanner.show {
+        .install-banner.show {
             display: flex;
         }
-        #installBanner .install-text {
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .install-banner .install-text {
             flex: 1;
             font-size: 14px;
-            min-width: 200px;
         }
-        #installBanner .install-text strong {
+        .install-banner .install-text strong {
             font-size: 16px;
             display: block;
             color: #f59e0b;
         }
-        #installBanner .install-text span {
-            opacity: 0.8;
-            font-size: 12px;
-        }
-        #installBanner .install-buttons {
+        .install-banner .install-buttons {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
         }
-        #installBanner .btn-install {
+        .install-banner .btn-install {
             background: #f59e0b;
             color: #0f172a;
             border: none;
-            padding: 10px 24px;
+            padding: 12px 24px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
         }
-        #installBanner .btn-install:hover {
+        .install-banner .btn-install:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(245,158,11,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
-        #installBanner .btn-close-install {
-            background: rgba(255,255,255,0.1);
+        .install-banner .btn-close-install {
+            background: rgba(255,255,255,0.15);
             color: white;
             border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px 18px;
+            padding: 12px 18px;
             border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s;
         }
-        #installBanner .btn-close-install:hover {
-            background: rgba(255,255,255,0.2);
+        .install-banner .btn-close-install:hover {
+            background: rgba(255,255,255,0.25);
         }
 
-        /* ===== BOTÓN FLOTANTE DE INSTALACIÓN SIEMPRE VISIBLE ===== */
-        #installFloatBtn {
+        /* ============================================================
+           BOTÓN FLOTANTE DE INSTALACIÓN (IGUAL QUE EXTINTORES)
+           ============================================================ */
+        .install-float-btn {
             position: fixed;
             bottom: 24px;
             right: 24px;
@@ -149,42 +152,43 @@
             font-size: 14px;
             box-shadow: 0 4px 20px rgba(245,158,11,0.4);
             cursor: pointer;
-            z-index: 998;
+            z-index: 100;
+            display: none;
             align-items: center;
             gap: 10px;
-            transition: all 0.3s;
-            animation: pulseInstall 2s infinite;
-            display: flex !important;
+            transition: all 0.3s ease;
+            animation: pulse-install 2s infinite;
         }
-        #installFloatBtn:hover {
+        .install-float-btn.show {
+            display: flex;
+        }
+        .install-float-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(245,158,11,0.6);
+            box-shadow: 0 8px 30px rgba(245,158,11,0.5);
         }
-        #installFloatBtn .icon {
+        .install-float-btn .icon {
             font-size: 24px;
         }
-
-        @keyframes pulseInstall {
-            0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(245,158,11,0.4); }
-            50% { transform: scale(1.03); box-shadow: 0 4px 40px rgba(245,158,11,0.7); }
+        @keyframes pulse-install {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
         }
-
         @media (display-mode: standalone) {
-            #installFloatBtn, #installBanner { display: none !important; }
+            .install-float-btn, .install-banner { display: none !important; }
         }
         @media (max-width:480px) {
-            #installFloatBtn { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 12px; }
-            #installFloatBtn .label { display: none; }
+            .install-float-btn { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 12px; }
+            .install-float-btn .label { display: none; }
         }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
 
-    <!-- ===== BANNER DE INSTALACIÓN PWA ===== -->
-    <div id="installBanner">
+    <!-- ===== BANNER DE INSTALACIÓN PWA (IGUAL QUE EXTINTORES) ===== -->
+    <div class="install-banner" id="installBanner">
         <div class="install-text">
             <strong>📱 Instalar INSSO Admin</strong>
-            <span>Acceso rápido desde tu pantalla de inicio</span>
+            <span>Instalá la app para acceso rápido</span>
         </div>
         <div class="install-buttons">
             <button class="btn-install" id="btnInstall">📲 Instalar</button>
@@ -192,8 +196,8 @@
         </div>
     </div>
 
-    <!-- ===== BOTÓN FLOTANTE DE INSTALACIÓN (SIEMPRE VISIBLE) ===== -->
-    <button id="installFloatBtn">
+    <!-- ===== BOTÓN FLOTANTE DE INSTALACIÓN (IGUAL QUE EXTINTORES) ===== -->
+    <button class="install-float-btn" id="installFloatBtn" title="Instalar App">
         <span class="icon">📲</span>
         <span class="label">Instalar App</span>
     </button>
@@ -429,7 +433,7 @@
         }
 
         // ============================================================
-        // PWA - INSTALACIÓN
+        // PWA - INSTALACIÓN (IGUAL QUE EXTINTORES)
         // ============================================================
         let deferredPrompt = null;
         const installBanner = document.getElementById('installBanner');
@@ -446,6 +450,7 @@
             e.preventDefault();
             deferredPrompt = e;
             installBanner.classList.add('show');
+            installFloatBtn.classList.add('show');
         });
 
         async function instalarApp() {
@@ -454,11 +459,11 @@
                 const result = await deferredPrompt.userChoice;
                 if (result.outcome === 'accepted') {
                     installBanner.classList.remove('show');
-                    installFloatBtn.style.display = 'none';
+                    installFloatBtn.classList.remove('show');
                 }
                 deferredPrompt = null;
             } else {
-                alert('📱 Para instalar, abre esta página en Chrome en tu celular.\n\nTambién puedes agregarla a la pantalla de inicio desde el menú del navegador.');
+                alert('📱 La instalación solo funciona en dispositivos móviles con Chrome o Safari.\n\nPodés agregar esta página a tu pantalla de inicio desde el menú del navegador.');
             }
         }
 
@@ -471,11 +476,11 @@
 
         window.addEventListener('appinstalled', () => {
             installBanner.classList.remove('show');
-            installFloatBtn.style.display = 'none';
+            installFloatBtn.classList.remove('show');
         });
 
         // ============================================================
-        // REGISTRO DEL SERVICE WORKER
+        // REGISTRO DEL SERVICE WORKER (IGUAL QUE EXTINTORES)
         // ============================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
