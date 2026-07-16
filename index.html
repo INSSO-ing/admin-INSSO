@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SISSO INGENIERÍA - Panel Administrativo</title>
-    <!-- Tailwind CSS para diseño profesional -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- SheetJS para exportar a Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -15,7 +13,6 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
 
-    <!-- PANTALLA DE ACCESO RESTRINGIDO (LOGIN) -->
     <div id="pantalla-login" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
             <div class="w-12 h-12 bg-teal-500/10 text-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-teal-500/20">
@@ -34,9 +31,7 @@
         </div>
     </div>
 
-    <!-- CONTENIDO DEL PANEL GENERAL (OCULTO POR DEFECTO) -->
     <div id="contenido-panel" class="max-w-6xl mx-auto hidden">
-        <!-- Encabezado del Panel -->
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
             <div>
                 <div class="flex items-center gap-2 mb-1">
@@ -52,7 +47,6 @@
             </button>
         </header>
 
-        <!-- Tabla de Controles -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
             <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
                 <h2 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Historial Reciente de Marcaciones</h2>
@@ -81,13 +75,12 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE FIREBASE Y SEGURIDAD -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-        // Cambia 'admin123' por la contraseña privada que prefieras para tu acceso
-        const CLAVE_MAESTRA = "admin123";
+        // Cambia '1234' por la contraseña privada que prefieras para tu acceso
+        const CLAVE_MAESTRA = "1234";
 
         const pantallaLogin = document.getElementById('pantalla-login');
         const contenidoPanel = document.getElementById('contenido-panel');
