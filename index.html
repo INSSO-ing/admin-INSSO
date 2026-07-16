@@ -6,7 +6,7 @@
     <title>INSSO Admin</title>
 
     <!-- ============================================================
-         PWA - MANIFEST EMBEBIDO (como en extintores)
+         PWA - MANIFEST EMBEBIDO
          ============================================================ -->
     <script>
         (function() {
@@ -135,9 +135,8 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* ===== BOTÓN FLOTANTE DE INSTALACIÓN ===== */
+        /* ===== BOTÓN FLOTANTE DE INSTALACIÓN SIEMPRE VISIBLE ===== */
         #installFloatBtn {
-            display: none;
             position: fixed;
             bottom: 24px;
             right: 24px;
@@ -155,9 +154,7 @@
             gap: 10px;
             transition: all 0.3s;
             animation: pulseInstall 2s infinite;
-        }
-        #installFloatBtn.show {
-            display: flex;
+            display: flex !important;
         }
         #installFloatBtn:hover {
             transform: scale(1.05);
@@ -195,7 +192,7 @@
         </div>
     </div>
 
-    <!-- ===== BOTÓN FLOTANTE DE INSTALACIÓN ===== -->
+    <!-- ===== BOTÓN FLOTANTE DE INSTALACIÓN (SIEMPRE VISIBLE) ===== -->
     <button id="installFloatBtn">
         <span class="icon">📲</span>
         <span class="label">Instalar App</span>
@@ -432,7 +429,7 @@
         }
 
         // ============================================================
-        // PWA - INSTALACIÓN (IGUAL QUE EN EXTINTORES)
+        // PWA - INSTALACIÓN
         // ============================================================
         let deferredPrompt = null;
         const installBanner = document.getElementById('installBanner');
@@ -449,7 +446,6 @@
             e.preventDefault();
             deferredPrompt = e;
             installBanner.classList.add('show');
-            installFloatBtn.classList.add('show');
         });
 
         async function instalarApp() {
@@ -458,11 +454,11 @@
                 const result = await deferredPrompt.userChoice;
                 if (result.outcome === 'accepted') {
                     installBanner.classList.remove('show');
-                    installFloatBtn.classList.remove('show');
+                    installFloatBtn.style.display = 'none';
                 }
                 deferredPrompt = null;
             } else {
-                alert('📱 La instalación solo funciona en dispositivos móviles con Chrome o Safari.\n\nPodés agregar esta página a tu pantalla de inicio desde el menú del navegador.');
+                alert('📱 Para instalar, abre esta página en Chrome en tu celular.\n\nTambién puedes agregarla a la pantalla de inicio desde el menú del navegador.');
             }
         }
 
@@ -475,7 +471,7 @@
 
         window.addEventListener('appinstalled', () => {
             installBanner.classList.remove('show');
-            installFloatBtn.classList.remove('show');
+            installFloatBtn.style.display = 'none';
         });
 
         // ============================================================
