@@ -3,10 +3,7 @@ const CACHE_NAME = 'insso-admin-v1';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/photo-removebg-preview.png',
-    'https://cdn.tailwindcss.com',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
-    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    '/photo-removebg-preview.png'
 ];
 
 // Instalación
@@ -38,7 +35,7 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// Fetch - Cache First
+// Fetch
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
@@ -46,10 +43,7 @@ self.addEventListener('fetch', event => {
                 if (response) {
                     return response;
                 }
-                return fetch(event.request).catch(() => {
-                    // Si falla la red, intentar devolver el index.html
-                    return caches.match('/index.html');
-                });
+                return fetch(event.request);
             })
     );
 });
