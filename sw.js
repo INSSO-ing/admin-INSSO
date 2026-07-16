@@ -1,5 +1,5 @@
-// sw.js - Service Worker para INSSO Admin
-const CACHE_NAME = 'insso-admin-v1';
+// sw.js - Service Worker para INSSO
+const CACHE_NAME = 'insso-v1';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -11,7 +11,7 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('✅ Cache INSSO Admin abierto');
+                console.log('✅ Cache INSSO abierto');
                 return cache.addAll(urlsToCache);
             })
     );
@@ -35,7 +35,7 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// Fetch
+// Fetch - Cache First
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
@@ -43,7 +43,9 @@ self.addEventListener('fetch', event => {
                 if (response) {
                     return response;
                 }
-                return fetch(event.request);
+                return fetch(event.request).catch(() => {
+                    return caches.match('/index.html');
+                });
             })
     );
 });
