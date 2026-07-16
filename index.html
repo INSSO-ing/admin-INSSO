@@ -3,23 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISSO INGENIERÍA - Panel Administrativo</title>
+    <title>INSSO - Panel Administrativo</title>
+
+    <!-- ============================================================
+         PWA - MANIFEST EMBEBIDO
+         ============================================================ -->
+    <script>
+        (function() {
+            const manifest = {
+                "name": "INSSO - Panel Administrativo",
+                "short_name": "INSSO Admin",
+                "description": "Panel de control de asistencia y marcaciones INSSO",
+                "start_url": "index.html",
+                "display": "standalone",
+                "background_color": "#0f172a",
+                "theme_color": "#0f172a",
+                "orientation": "portrait",
+                "icons": [
+                    {
+                        "src": "photo-removebg-preview.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                        "purpose": "any"
+                    },
+                    {
+                        "src": "photo-removebg-preview.png",
+                        "sizes": "512x512",
+                        "type": "image/png",
+                        "purpose": "any"
+                    },
+                    {
+                        "src": "photo-removebg-preview.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                        "purpose": "maskable"
+                    }
+                ]
+            };
+            
+            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = url;
+            document.head.appendChild(link);
+        })();
+    </script>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="INSSO Admin">
+    <meta name="theme-color" content="#0f172a">
+    
+    <link rel="icon" type="image/png" href="photo-removebg-preview.png">
+    <link rel="apple-touch-icon" href="photo-removebg-preview.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
         body { font-family: 'Inter', sans-serif; }
+
+        /* ===== BANNER DE INSTALACIÓN PWA ===== */
+        #installBanner {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 16px 20px;
+            z-index: 9999;
+            box-shadow: 0 -4px 30px rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 3px solid #f59e0b;
+        }
+        #installBanner.show {
+            display: flex;
+        }
+        #installBanner .install-text {
+            flex: 1;
+            font-size: 14px;
+            min-width: 200px;
+        }
+        #installBanner .install-text strong {
+            font-size: 16px;
+            display: block;
+            color: #f59e0b;
+        }
+        #installBanner .install-text span {
+            opacity: 0.8;
+            font-size: 12px;
+        }
+        #installBanner .install-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        #installBanner .btn-install {
+            background: #f59e0b;
+            color: #0f172a;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #installBanner .btn-install:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(245,158,11,0.3);
+        }
+        #installBanner .btn-close-install {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        #installBanner .btn-close-install:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ===== BOTÓN FLOTANTE DE INSTALACIÓN ===== */
+        #installFloatBtn {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #0f172a;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 22px;
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 4px 20px rgba(245,158,11,0.4);
+            cursor: pointer;
+            z-index: 998;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            animation: pulseInstall 2s infinite;
+        }
+        #installFloatBtn.show {
+            display: flex;
+        }
+        #installFloatBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(245,158,11,0.6);
+        }
+        #installFloatBtn .icon {
+            font-size: 20px;
+        }
+
+        @keyframes pulseInstall {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(245,158,11,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 40px rgba(245,158,11,0.7); }
+        }
+
+        @media (display-mode: standalone) {
+            #installFloatBtn, #installBanner { display: none !important; }
+        }
+        @media (max-width:480px) {
+            #installFloatBtn { bottom: 90px; right: 16px; padding: 12px 16px; font-size: 12px; }
+            #installFloatBtn .label { display: none; }
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
 
+    <!-- ===== BANNER DE INSTALACIÓN PWA ===== -->
+    <div id="installBanner" class="show">
+        <div class="install-text">
+            <strong>📱 Instalar INSSO Admin</strong>
+            <span>Acceso rápido desde tu pantalla de inicio</span>
+        </div>
+        <div class="install-buttons">
+            <button class="btn-install" id="btnInstall">📲 Instalar</button>
+            <button class="btn-close-install" id="btnCloseInstall">✕</button>
+        </div>
+    </div>
+
+    <!-- ===== BOTÓN FLOTANTE DE INSTALACIÓN ===== -->
+    <button id="installFloatBtn" class="show">
+        <span class="icon">📲</span>
+        <span class="label">Instalar App</span>
+    </button>
+
+    <!-- ============================================================
+         PANTALLA DE LOGIN
+         ============================================================ -->
     <div id="pantalla-login" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
             <div class="w-12 h-12 bg-teal-500/10 text-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-teal-500/20">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
             </div>
             <h2 class="text-xl font-bold text-white mb-1">Acceso Administrativo</h2>
-            <p class="text-xs text-slate-400 mb-5">SISSO INGENIERÍA - Área Privada</p>
+            <p class="text-xs text-slate-400 mb-5">INSSO - Área Privada</p>
             
             <div class="space-y-3">
                 <input type="password" id="input-password" placeholder="Introduzca la clave maestra" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-slate-100 font-semibold focus:outline-none focus:border-teal-500 transition-all">
@@ -31,22 +223,30 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         PANEL ADMINISTRATIVO
+         ============================================================ -->
     <div id="contenido-panel" class="max-w-6xl mx-auto hidden">
+        
+        <!-- HEADER -->
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span class="text-xs font-semibold uppercase tracking-wider text-teal-400">Panel Central de Monitoreo</span>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight text-white">SISSO INGENIERÍA</h1>
+                <h1 class="text-2xl font-bold tracking-tight text-white">INSSO</h1>
                 <p class="text-xs text-slate-400 mt-0.5">Control de Asistencia, Liquidación de Salarios y Ubicación en Tiempo Real</p>
             </div>
             <button id="btn-exportar" class="w-full md:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
                 Descargar Reporte Excel
             </button>
         </header>
 
+        <!-- TABLA DE MARCACIONES -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
             <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
                 <h2 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Historial Reciente de Marcaciones</h2>
@@ -79,7 +279,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-        // Cambia '1234' por la contraseña privada que prefieras para tu acceso
+        // ============================================================
+        // CONFIGURACIÓN
+        // ============================================================
         const CLAVE_MAESTRA = "1234";
 
         const pantallaLogin = document.getElementById('pantalla-login');
@@ -88,6 +290,9 @@
         const btnLogin = document.getElementById('btn-login');
         const errorLogin = document.getElementById('error-login');
 
+        // ============================================================
+        // VERIFICAR ACCESO
+        // ============================================================
         function verificarAcceso() {
             if (inputPassword.value === CLAVE_MAESTRA) {
                 pantallaLogin.classList.add('hidden');
@@ -96,14 +301,21 @@
             } else {
                 errorLogin.classList.remove('hidden');
                 inputPassword.value = "";
+                setTimeout(() => {
+                    errorLogin.classList.add('hidden');
+                }, 3000);
             }
         }
 
         btnLogin.addEventListener('click', verificarAcceso);
-        inputPassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') verificarAcceso(); });
+        inputPassword.addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') verificarAcceso(); 
+        });
 
+        // ============================================================
+        // CONEXIÓN A FIREBASE
+        // ============================================================
         function conectarFirebase() {
-            // Configuración directa y enlazada con tu Realtime Database
             const firebaseConfig = {
                 databaseURL: "https://marcacion-insso-default-rtdb.firebaseio.com"
             };
@@ -114,7 +326,6 @@
             const contadorRegistros = document.getElementById('contador-registros');
             let todasLasMarcaciones = [];
 
-            // Apuntando de forma absoluta al nodo que contiene tus registros (-OxBsZxRy...)
             const marcacionesRef = ref(db, '/marcaciones_sisso');
             
             onValue(marcacionesRef, (snapshot) => {
@@ -125,6 +336,7 @@
                         <tr>
                             <td colspan="6" class="p-8 text-center text-slate-500 italic">No se encontraron datos en el nodo 'marcaciones_sisso'.</td>
                         </tr>`;
+                    contadorRegistros.innerText = `0 marcas registradas`;
                     return;
                 }
 
@@ -135,7 +347,6 @@
                     lista.push({ id, ...data[id] }); 
                 });
                 
-                // Ordenar cronológicamente para que las marcas más nuevas salgan primero
                 lista.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                 todasLasMarcaciones = lista;
 
@@ -162,7 +373,12 @@
 
                     let calculoJornada = `<span class="text-slate-500 text-xs">—</span>`;
                     if (!esEntrada) {
-                        const entrada = lista.find(m => m.empleado === marcacion.empleado && m.fecha === marcacion.fecha && m.tipo === "ENTRADA" && (m.timestamp || 0) < (marcacion.timestamp || 0));
+                        const entrada = lista.find(m => 
+                            m.empleado === marcacion.empleado && 
+                            m.fecha === marcacion.fecha && 
+                            m.tipo === "ENTRADA" && 
+                            (m.timestamp || 0) < (marcacion.timestamp || 0)
+                        );
                         if (entrada && entrada.timestamp && marcacion.timestamp) {
                             const totalHoras = ((marcacion.timestamp - entrada.timestamp) / (1000 * 60 * 60)).toFixed(2);
                             calculoJornada = `<span class="text-teal-400 font-bold bg-teal-500/5 border border-teal-500/10 px-2 py-1 rounded-md text-xs">⏱ ${totalHoras} hrs</span>`;
@@ -191,15 +407,90 @@
                     </tr>`;
             });
 
+            // ============================================================
+            // EXPORTAR A EXCEL
+            // ============================================================
             document.getElementById('btn-exportar').addEventListener('click', () => {
-                if (todasLasMarcaciones.length === 0) return;
+                if (todasLasMarcaciones.length === 0) {
+                    alert('No hay datos para exportar.');
+                    return;
+                }
                 const filasExcel = todasLasMarcaciones.map(m => ({
-                    'Colaborador': m.empleado, 'Empresa': m.empresa, 'Fecha': m.fecha, 'Hora': m.hora, 'Tipo': m.tipo, 'GPS': m.coordenadas
+                    'Colaborador': m.empleado || 'N/A',
+                    'Empresa': m.empresa || 'INSSO',
+                    'Fecha': m.fecha || 'N/A',
+                    'Hora': m.hora || 'N/A',
+                    'Tipo': m.tipo || 'N/A',
+                    'GPS': m.coordenadas || 'Sin señal'
                 }));
                 const hoja = XLSX.utils.json_to_sheet(filasExcel);
                 const libro = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(libro, hoja, "Marcaciones");
-                XLSX.writeFile(libro, `Asistencia_SISSO.xlsx`);
+                XLSX.writeFile(libro, `Asistencia_INSSO.xlsx`);
+            });
+        }
+
+        // ============================================================
+        // PWA - INSTALACIÓN
+        // ============================================================
+        let deferredPrompt = null;
+        const installBanner = document.getElementById('installBanner');
+        const btnInstall = document.getElementById('btnInstall');
+        const btnCloseInstall = document.getElementById('btnCloseInstall');
+        const installFloatBtn = document.getElementById('installFloatBtn');
+
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            if (installBanner) installBanner.style.display = 'none';
+            if (installFloatBtn) installFloatBtn.style.display = 'none';
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBanner) installBanner.classList.add('show');
+            if (installFloatBtn) installFloatBtn.classList.add('show');
+        });
+
+        async function instalarApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const result = await deferredPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    if (installBanner) installBanner.classList.remove('show');
+                    if (installFloatBtn) installFloatBtn.classList.remove('show');
+                }
+                deferredPrompt = null;
+            } else {
+                alert('📱 Para instalar, abre esta página en Chrome en tu celular.\n\nTambién puedes agregarla a la pantalla de inicio desde el menú del navegador.');
+            }
+        }
+
+        if (btnInstall) btnInstall.addEventListener('click', instalarApp);
+        if (installFloatBtn) installFloatBtn.addEventListener('click', instalarApp);
+
+        if (btnCloseInstall) {
+            btnCloseInstall.addEventListener('click', () => {
+                if (installBanner) installBanner.classList.remove('show');
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            if (installBanner) installBanner.classList.remove('show');
+            if (installFloatBtn) installFloatBtn.classList.remove('show');
+        });
+
+        // ============================================================
+        // REGISTRO DEL SERVICE WORKER
+        // ============================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker INSSO Admin registrado:', registration);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error al registrar Service Worker:', error);
+                    });
             });
         }
     </script>
