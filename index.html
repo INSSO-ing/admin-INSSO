@@ -6,7 +6,7 @@
     <title>INSSO Admin</title>
 
     <!-- ============================================================
-         PWA - MANIFEST EMBEBIDO (IGUAL QUE EXTINTORES)
+         PWA - MANIFEST EMBEBIDO (en línea)
          ============================================================ -->
     <script>
         (function() {
@@ -21,19 +21,19 @@
                 "orientation": "portrait",
                 "icons": [
                     {
-                        "src": "photo-removebg-preview.png",
+                        "src": "logo-insso.png",
                         "sizes": "192x192",
                         "type": "image/png",
                         "purpose": "any"
                     },
                     {
-                        "src": "photo-removebg-preview.png",
+                        "src": "logo-insso.png",
                         "sizes": "512x512",
                         "type": "image/png",
                         "purpose": "any"
                     },
                     {
-                        "src": "photo-removebg-preview.png",
+                        "src": "logo-insso.png",
                         "sizes": "192x192",
                         "type": "image/png",
                         "purpose": "maskable"
@@ -54,22 +54,56 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="INSSO Admin">
     <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="Panel de control de asistencia INSSO">
     
-    <link rel="icon" type="image/png" href="photo-removebg-preview.png">
-    <link rel="apple-touch-icon" href="photo-removebg-preview.png">
+    <link rel="icon" type="image/png" href="logo-insso.png">
+    <link rel="apple-touch-icon" href="logo-insso.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; }
+        
+        /* ===== PANTALLA DE CARGA ===== */
+        #pantalla-carga {
+            position: fixed;
+            inset: 0;
+            background: #0f172a;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        #pantalla-carga.oculta {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader-bar {
+            width: 200px;
+            height: 4px;
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 24px;
+        }
+        .loader-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #10b981, #14b8a6);
+            border-radius: 4px;
+            animation: cargar 2s ease-in-out infinite;
+        }
+        @keyframes cargar {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
 
-        /* ============================================================
-           BANNER DE INSTALACIÓN PWA (IGUAL QUE EXTINTORES)
-           ============================================================ */
-        .install-banner {
+        /* ===== BANNER DE INSTALACIÓN ===== */
+        #installBanner {
             display: none;
             position: fixed;
             bottom: 0;
@@ -77,69 +111,68 @@
             right: 0;
             background: linear-gradient(135deg, #0f172a, #1e293b);
             color: white;
-            padding: 16px 24px;
-            z-index: 999;
+            padding: 16px 20px;
+            z-index: 9998;
             box-shadow: 0 -4px 30px rgba(0,0,0,0.4);
-            animation: slideUp 0.5s ease-out;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
             flex-wrap: wrap;
             border-top: 3px solid #f59e0b;
         }
-        .install-banner.show {
+        #installBanner.show {
             display: flex;
         }
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .install-banner .install-text {
+        #installBanner .install-text {
             flex: 1;
             font-size: 14px;
+            min-width: 200px;
         }
-        .install-banner .install-text strong {
+        #installBanner .install-text strong {
             font-size: 16px;
             display: block;
             color: #f59e0b;
         }
-        .install-banner .install-buttons {
+        #installBanner .install-text span {
+            opacity: 0.8;
+            font-size: 12px;
+        }
+        #installBanner .install-buttons {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
-        .install-banner .btn-install {
+        #installBanner .btn-install {
             background: #f59e0b;
             color: #0f172a;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 24px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
         }
-        .install-banner .btn-install:hover {
+        #installBanner .btn-install:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 20px rgba(245,158,11,0.3);
         }
-        .install-banner .btn-close-install {
-            background: rgba(255,255,255,0.15);
+        #installBanner .btn-close-install {
+            background: rgba(255,255,255,0.1);
             color: white;
             border: 1px solid rgba(255,255,255,0.2);
-            padding: 12px 18px;
+            padding: 10px 18px;
             border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s;
         }
-        .install-banner .btn-close-install:hover {
-            background: rgba(255,255,255,0.25);
+        #installBanner .btn-close-install:hover {
+            background: rgba(255,255,255,0.2);
         }
 
-        /* ============================================================
-           BOTÓN FLOTANTE DE INSTALACIÓN (IGUAL QUE EXTINTORES)
-           ============================================================ */
-        .install-float-btn {
+        /* ===== BOTÓN FLOTANTE INSTALACIÓN ===== */
+        #installFloatBtn {
             position: fixed;
             bottom: 24px;
             right: 24px;
@@ -152,43 +185,61 @@
             font-size: 14px;
             box-shadow: 0 4px 20px rgba(245,158,11,0.4);
             cursor: pointer;
-            z-index: 100;
-            display: none;
+            z-index: 9997;
             align-items: center;
             gap: 10px;
-            transition: all 0.3s ease;
-            animation: pulse-install 2s infinite;
+            transition: all 0.3s;
+            animation: pulseInstall 2s infinite;
+            display: flex !important;
         }
-        .install-float-btn.show {
-            display: flex;
-        }
-        .install-float-btn:hover {
+        #installFloatBtn:hover {
             transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(245,158,11,0.5);
+            box-shadow: 0 8px 30px rgba(245,158,11,0.6);
         }
-        .install-float-btn .icon {
-            font-size: 24px;
+        #installFloatBtn .icon { font-size: 24px; }
+
+        @keyframes pulseInstall {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(245,158,11,0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 4px 40px rgba(245,158,11,0.7); }
         }
-        @keyframes pulse-install {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
+
         @media (display-mode: standalone) {
-            .install-float-btn, .install-banner { display: none !important; }
+            #installFloatBtn, #installBanner { display: none !important; }
         }
         @media (max-width:480px) {
-            .install-float-btn { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 12px; }
-            .install-float-btn .label { display: none; }
+            #installFloatBtn { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 12px; }
+            #installFloatBtn .label { display: none; }
         }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+<body>
 
-    <!-- ===== BANNER DE INSTALACIÓN PWA (IGUAL QUE EXTINTORES) ===== -->
-    <div class="install-banner" id="installBanner">
+    <!-- ============================================================
+         PANTALLA DE CARGA
+         ============================================================ -->
+    <div id="pantalla-carga">
+        <div class="flex flex-col items-center">
+            <img src="logo-insso.png" alt="INSSO Logo" class="w-24 h-24 object-contain mb-4">
+            <p class="text-white font-bold text-lg tracking-wider">INSSO Admin</p>
+            <p class="text-slate-400 text-xs mt-1">Panel de Control</p>
+            <div class="loader-bar"><div class="fill"></div></div>
+            <p class="text-slate-500 text-[10px] mt-3 tracking-widest uppercase">Cargando sistema...</p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         BANNER DE INSTALACIÓN
+         ============================================================ -->
+    <div id="installBanner">
         <div class="install-text">
             <strong>📱 Instalar INSSO Admin</strong>
-            <span>Instalá la app para acceso rápido</span>
+            <span>Acceso rápido desde tu pantalla de inicio</span>
         </div>
         <div class="install-buttons">
             <button class="btn-install" id="btnInstall">📲 Instalar</button>
@@ -196,8 +247,10 @@
         </div>
     </div>
 
-    <!-- ===== BOTÓN FLOTANTE DE INSTALACIÓN (IGUAL QUE EXTINTORES) ===== -->
-    <button class="install-float-btn" id="installFloatBtn" title="Instalar App">
+    <!-- ============================================================
+         BOTÓN FLOTANTE
+         ============================================================ -->
+    <button id="installFloatBtn">
         <span class="icon">📲</span>
         <span class="label">Instalar App</span>
     </button>
@@ -207,16 +260,15 @@
          ============================================================ -->
     <div id="pantalla-login" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-            <div class="w-12 h-12 bg-teal-500/10 text-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-teal-500/20">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
+            <div class="w-16 h-16 bg-teal-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-teal-500/20">
+                <img src="logo-insso.png" alt="INSSO" class="w-12 h-12 object-contain">
             </div>
             <h2 class="text-xl font-bold text-white mb-1">Acceso Administrativo</h2>
             <p class="text-xs text-slate-400 mb-5">INSSO Admin - Área Privada</p>
             
             <div class="space-y-3">
-                <input type="password" id="input-password" placeholder="Introduzca la clave maestra" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-slate-100 font-semibold focus:outline-none focus:border-teal-500 transition-all">
+                <input type="password" id="input-password" placeholder="Introduzca la clave maestra" 
+                       class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-slate-100 font-semibold focus:outline-none focus:border-teal-500 transition-all">
                 <button id="btn-login" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-950/20">
                     Verificar Identidad
                 </button>
@@ -228,31 +280,72 @@
     <!-- ============================================================
          PANEL ADMINISTRATIVO
          ============================================================ -->
-    <div id="contenido-panel" class="max-w-6xl mx-auto hidden">
+    <div id="contenido-panel" class="max-w-6xl mx-auto p-4 md:p-8 hidden">
         
         <!-- HEADER -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-slate-800/95 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 shadow-xl">
             <div>
                 <div class="flex items-center gap-2 mb-1">
                     <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span class="text-xs font-semibold uppercase tracking-wider text-teal-400">Panel Central de Monitoreo</span>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight text-white">INSSO Admin</h1>
+                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+                    INSSO Admin
+                    <span class="text-[10px] bg-slate-700/50 px-2 py-0.5 rounded-full text-slate-300 font-mono">v2.0</span>
+                </h1>
                 <p class="text-xs text-slate-400 mt-0.5">Panel de Control · Asistencia y Marcaciones</p>
             </div>
-            <button id="btn-exportar" class="w-full md:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                Descargar Reporte Excel
-            </button>
+            <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <button id="btn-refrescar" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Actualizar
+                </button>
+                <button id="btn-exportar" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Exportar Excel
+                </button>
+            </div>
         </header>
 
+        <!-- ESTADÍSTICAS RÁPIDAS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="stats-container">
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-teal-400" id="total-registros">0</p>
+                <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Total Marcaciones</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-emerald-400" id="total-entradas">0</p>
+                <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Entradas</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-rose-400" id="total-salidas">0</p>
+                <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Salidas</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-amber-400" id="total-empleados">0</p>
+                <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Colaboradores</p>
+            </div>
+        </div>
+
         <!-- TABLA DE MARCACIONES -->
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
-            <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
-                <h2 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Historial Reciente de Marcaciones</h2>
-                <span id="contador-registros" class="text-xs bg-slate-950 border border-slate-700 px-3 py-1 rounded-full text-teal-400 font-medium">0 marcas registradas</span>
+        <div class="bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-800/50">
+                <h2 class="text-sm font-semibold tracking-wider uppercase text-slate-400 flex items-center gap-2">
+                    📋 Historial de Marcaciones
+                    <span class="text-[10px] bg-slate-700/50 px-2 py-0.5 rounded-full text-slate-300 font-mono font-normal" id="contador-registros">0</span>
+                </h2>
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                    <span class="inline-flex items-center gap-1">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Entrada
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                        <span class="h-2 w-2 rounded-full bg-rose-500"></span> Salida
+                    </span>
+                </div>
             </div>
             
             <div class="overflow-x-auto">
@@ -263,20 +356,28 @@
                             <th class="p-4">Fecha</th>
                             <th class="p-4">Hora</th>
                             <th class="p-4">Evento</th>
-                            <th class="p-4">Cálculo de Jornada</th>
-                            <th class="p-4 text-center">Ubicación (GPS)</th>
+                            <th class="p-4">Jornada</th>
+                            <th class="p-4 text-center">Ubicación</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-cuerpo" class="divide-y divide-slate-700/50 text-sm font-medium">
                         <tr id="fila-vacia">
-                            <td colspan="6" class="p-8 text-center text-slate-500 italic">Esperando marcaciones...</td>
+                            <td colspan="6" class="p-8 text-center text-slate-500 italic">⏳ Cargando marcaciones...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- FOOTER -->
+        <footer class="text-center text-[10px] text-slate-500 mt-8 tracking-wider border-t border-slate-800/50 pt-4">
+            INSSO Admin v2.0 · Todos los datos son sincronizados en tiempo real con Firebase
+        </footer>
     </div>
 
+    <!-- ============================================================
+         SCRIPT PRINCIPAL
+         ============================================================ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
@@ -286,11 +387,20 @@
         // ============================================================
         const CLAVE_MAESTRA = "1234";
 
+        const pantallaCarga = document.getElementById('pantalla-carga');
         const pantallaLogin = document.getElementById('pantalla-login');
         const contenidoPanel = document.getElementById('contenido-panel');
         const inputPassword = document.getElementById('input-password');
         const btnLogin = document.getElementById('btn-login');
         const errorLogin = document.getElementById('error-login');
+
+        // ============================================================
+        // OCULTAR PANTALLA DE CARGA
+        // ============================================================
+        setTimeout(() => {
+            pantallaCarga.classList.add('oculta');
+            setTimeout(() => pantallaCarga.style.display = 'none', 800);
+        }, 2500);
 
         // ============================================================
         // VERIFICAR ACCESO
@@ -299,10 +409,12 @@
             if (inputPassword.value === CLAVE_MAESTRA) {
                 pantallaLogin.classList.add('hidden');
                 contenidoPanel.classList.remove('hidden');
+                document.body.style.overflow = 'auto';
                 conectarFirebase();
             } else {
                 errorLogin.classList.remove('hidden');
                 inputPassword.value = "";
+                inputPassword.focus();
                 setTimeout(() => {
                     errorLogin.classList.add('hidden');
                 }, 3000);
@@ -336,27 +448,51 @@
                 if (!data) {
                     tablaCuerpo.innerHTML = `
                         <tr>
-                            <td colspan="6" class="p-8 text-center text-slate-500 italic">No se encontraron datos en el nodo 'marcaciones_sisso'.</td>
+                            <td colspan="6" class="p-8 text-center text-slate-500 italic">📭 No se encontraron datos en la base de datos.</td>
                         </tr>`;
-                    contadorRegistros.innerText = `0 marcas registradas`;
+                    contadorRegistros.innerText = '0';
+                    document.getElementById('total-registros').innerText = '0';
+                    document.getElementById('total-entradas').innerText = '0';
+                    document.getElementById('total-salidas').innerText = '0';
+                    document.getElementById('total-empleados').innerText = '0';
                     return;
                 }
 
-                tablaCuerpo.innerHTML = "";
                 const lista = [];
+                const empleadosSet = new Set();
+                let entradas = 0, salidas = 0;
                 
                 Object.keys(data).forEach(id => { 
-                    lista.push({ id, ...data[id] }); 
+                    const item = { id, ...data[id] };
+                    lista.push(item);
+                    if (item.empleado) empleadosSet.add(item.empleado);
+                    if (item.tipo === 'ENTRADA') entradas++;
+                    if (item.tipo === 'SALIDA') salidas++;
                 });
                 
                 lista.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                 todasLasMarcaciones = lista;
 
-                contadorRegistros.innerText = `${lista.length} marcas registradas`;
+                // Actualizar estadísticas
+                document.getElementById('total-registros').innerText = lista.length;
+                document.getElementById('total-entradas').innerText = entradas;
+                document.getElementById('total-salidas').innerText = salidas;
+                document.getElementById('total-empleados').innerText = empleadosSet.size;
+                contadorRegistros.innerText = lista.length;
+
+                if (lista.length === 0) {
+                    tablaCuerpo.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-slate-500 italic">📭 No hay marcaciones para mostrar.</td>
+                        </tr>`;
+                    return;
+                }
+
+                tablaCuerpo.innerHTML = "";
 
                 lista.forEach((marcacion) => {
                     const fila = document.createElement('tr');
-                    fila.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-700/30";
+                    fila.className = "hover:bg-slate-800/40 transition-colors";
 
                     const esEntrada = marcacion.tipo === "ENTRADA";
                     const badgeTipo = esEntrada 
@@ -367,8 +503,9 @@
                     if (marcacion.coordenadas) {
                         columnaGps = `
                             <div class="flex justify-center">
-                                <a href="https://maps.google.com/?q=${marcacion.coordenadas}" target="_blank" class="inline-flex items-center gap-1 bg-slate-700/60 hover:bg-slate-700 text-teal-400 hover:text-teal-300 px-3 py-1.5 rounded-lg border border-slate-600 transition-all text-xs">
-                                    Ver en Google Maps
+                                <a href="https://maps.google.com/?q=${marcacion.coordenadas}" target="_blank" 
+                                   class="inline-flex items-center gap-1 bg-slate-700/60 hover:bg-slate-700 text-teal-400 hover:text-teal-300 px-3 py-1.5 rounded-lg border border-slate-600 transition-all text-xs">
+                                    📍 Ver Mapa
                                 </a>
                             </div>`;
                     }
@@ -383,12 +520,12 @@
                         );
                         if (entrada && entrada.timestamp && marcacion.timestamp) {
                             const totalHoras = ((marcacion.timestamp - entrada.timestamp) / (1000 * 60 * 60)).toFixed(2);
-                            calculoJornada = `<span class="text-teal-400 font-bold bg-teal-500/5 border border-teal-500/10 px-2 py-1 rounded-md text-xs">⏱ ${totalHoras} hrs</span>`;
+                            calculoJornada = `<span class="text-teal-400 font-bold bg-teal-500/5 border border-teal-500/10 px-2 py-1 rounded-md text-xs">⏱ ${totalHoras}h</span>`;
                         } else {
                             calculoJornada = `<span class="text-amber-500 font-semibold text-xs">⚠️ Sin Entrada</span>`;
                         }
                     } else {
-                        calculoJornada = `<span class="text-slate-400 text-xs">Turno abierto...</span>`;
+                        calculoJornada = `<span class="text-slate-400 text-xs">Turno abierto</span>`;
                     }
 
                     fila.innerHTML = `
@@ -405,8 +542,31 @@
                 console.error("Error de Firebase:", error);
                 tablaCuerpo.innerHTML = `
                     <tr>
-                        <td colspan="6" class="p-8 text-center text-rose-400 italic">Error de conexión: Permiso denegado en Firebase. Revisa las Rules.</td>
+                        <td colspan="6" class="p-8 text-center text-rose-400 italic">
+                            🔴 Error de conexión: ${error.message || 'Permiso denegado en Firebase. Revisa las Rules.'}
+                        </td>
                     </tr>`;
+            });
+
+            // ============================================================
+            // BOTÓN REFRESCAR
+            // ============================================================
+            document.getElementById('btn-refrescar').addEventListener('click', () => {
+                const btn = document.getElementById('btn-refrescar');
+                btn.innerHTML = `
+                    <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Actualizando...`;
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.innerHTML = `
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Actualizar`;
+                    btn.disabled = false;
+                }, 1500);
             });
 
             // ============================================================
@@ -414,26 +574,46 @@
             // ============================================================
             document.getElementById('btn-exportar').addEventListener('click', () => {
                 if (todasLasMarcaciones.length === 0) {
-                    alert('No hay datos para exportar.');
+                    alert('📭 No hay datos para exportar.');
                     return;
                 }
-                const filasExcel = todasLasMarcaciones.map(m => ({
-                    'Colaborador': m.empleado || 'N/A',
-                    'Empresa': m.empresa || 'INSSO',
-                    'Fecha': m.fecha || 'N/A',
-                    'Hora': m.hora || 'N/A',
-                    'Tipo': m.tipo || 'N/A',
-                    'GPS': m.coordenadas || 'Sin señal'
-                }));
-                const hoja = XLSX.utils.json_to_sheet(filasExcel);
+
+                const datosExport = todasLasMarcaciones.map(m => {
+                    let jornada = 'N/A';
+                    if (m.tipo === 'SALIDA') {
+                        const entrada = todasLasMarcaciones.find(e => 
+                            e.empleado === m.empleado && 
+                            e.fecha === m.fecha && 
+                            e.tipo === 'ENTRADA' && 
+                            (e.timestamp || 0) < (m.timestamp || 0)
+                        );
+                        if (entrada && entrada.timestamp && m.timestamp) {
+                            const horas = ((m.timestamp - entrada.timestamp) / (1000 * 60 * 60)).toFixed(2);
+                            jornada = `${horas} hrs`;
+                        }
+                    }
+                    return {
+                        'Colaborador': m.empleado || 'N/A',
+                        'Empresa': m.empresa || 'INSSO',
+                        'Fecha': m.fecha || 'N/A',
+                        'Hora': m.hora || 'N/A',
+                        'Evento': m.tipo || 'N/A',
+                        'Jornada Calculada': jornada,
+                        'Coordenadas GPS': m.coordenadas || 'Sin señal'
+                    };
+                });
+
+                const hoja = XLSX.utils.json_to_sheet(datosExport);
                 const libro = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(libro, hoja, "Marcaciones");
-                XLSX.writeFile(libro, `Asistencia_INSSO.xlsx`);
+                
+                const fecha = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+                XLSX.writeFile(libro, `Asistencia_INSSO_${fecha}.xlsx`);
             });
         }
 
         // ============================================================
-        // PWA - INSTALACIÓN (IGUAL QUE EXTINTORES)
+        // PWA - INSTALACIÓN
         // ============================================================
         let deferredPrompt = null;
         const installBanner = document.getElementById('installBanner');
@@ -450,7 +630,6 @@
             e.preventDefault();
             deferredPrompt = e;
             installBanner.classList.add('show');
-            installFloatBtn.classList.add('show');
         });
 
         async function instalarApp() {
@@ -459,11 +638,16 @@
                 const result = await deferredPrompt.userChoice;
                 if (result.outcome === 'accepted') {
                     installBanner.classList.remove('show');
-                    installFloatBtn.classList.remove('show');
+                    installFloatBtn.style.display = 'none';
                 }
                 deferredPrompt = null;
             } else {
-                alert('📱 La instalación solo funciona en dispositivos móviles con Chrome o Safari.\n\nPodés agregar esta página a tu pantalla de inicio desde el menú del navegador.');
+                const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (esIOS) {
+                    alert("📱 Para instalar en iPhone:\n\n1. Presiona el botón 'Compartir' (cuadro con flecha)\n2. Desliza hacia abajo y selecciona 'Añadir a la pantalla de inicio'\n3. Presiona 'Añadir'");
+                } else {
+                    alert("📱 Para instalar, abre esta página en Chrome y selecciona 'Instalar aplicación' en el menú de 3 puntos.\n\nO desde el menú del navegador, elige 'Añadir a la pantalla de inicio'.");
+                }
             }
         }
 
@@ -476,23 +660,39 @@
 
         window.addEventListener('appinstalled', () => {
             installBanner.classList.remove('show');
-            installFloatBtn.classList.remove('show');
+            installFloatBtn.style.display = 'none';
         });
 
         // ============================================================
-        // REGISTRO DEL SERVICE WORKER (IGUAL QUE EXTINTORES)
+        // SERVICE WORKER - REGISTRO AUTOMÁTICO
         // ============================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('✅ Service Worker INSSO Admin registrado:', registration);
-                    })
-                    .catch(function(error) {
-                        console.log('❌ Error al registrar Service Worker:', error);
+                // Registrar un Service Worker simple (puedes crear sw.js aparte o usar este)
+                const swCode = `
+                    self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+                    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(
+                            caches.match(e.request).then(r => r || fetch(e.request))
+                        );
                     });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log('✅ Service Worker registrado'))
+                    .catch(() => console.log('❌ Error SW'));
             });
         }
+
+        // ============================================================
+        // PREVENIR ZOOM EN MÓVILES
+        // ============================================================
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+        document.addEventListener('gesturechange', (e) => e.preventDefault());
+        document.addEventListener('gestureend', (e) => e.preventDefault());
     </script>
 </body>
 </html>
