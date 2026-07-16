@@ -572,7 +572,7 @@
         }
 
         // ============================================================
-        // PWA - INSTALACIÓN (CORREGIDO)
+        // PWA - INSTALACIÓN
         // ============================================================
         let deferredPrompt = null;
         const installBanner = document.getElementById('installBanner');
@@ -634,44 +634,56 @@
         });
 
         // ============================================================
-        // SERVICE WORKER
+        // SERVICE WORKER (REGISTRO AUTOMÁTICO EN LÍNEA)
         // ============================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('✅ Service Worker INSSO Admin registrado:', registration);
-                    })
-                    .catch(function(error) {
-                        console.log('❌ Error al registrar Service Worker:', error);
-                        // Si no existe sw.js, crearlo automáticamente
-                        crearSWFallback();
+                // Generamos el SW directamente desde el código
+                const swCode = `
+                    const CACHE_NAME = 'insso-admin-v1';
+                    const ASSETS = ['index.html', 'manifest.json', 'logo-insso.png'];
+                    
+                    self.addEventListener('install', e => {
+                        e.waitUntil(
+                            caches.open(CACHE_NAME).then(cache => {
+                                console.log('✅ Cacheando assets...');
+                                return cache.addAll(ASSETS);
+                            }).then(() => self.skipWaiting())
+                        );
                     });
+                    
+                    self.addEventListener('activate', e => {
+                        e.waitUntil(
+                            caches.keys().then(keys => {
+                                return Promise.all(
+                                    keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+                                );
+                            }).then(() => self.clients.claim())
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(
+                            caches.match(e.request).then(r => {
+                                return r || fetch(e.request).then(res => {
+                                    const clone = res.clone();
+                                    caches.open(CACHE_NAME).then(cache => {
+                                        cache.put(e.request, clone);
+                                    });
+                                    return res;
+                                }).catch(() => caches.match('index.html'));
+                            })
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log('✅ Service Worker INSSO Admin registrado'))
+                    .catch((error) => console.log('❌ Error SW:', error));
             });
-        }
-
-        // Fallback: crear SW automáticamente si no existe
-        function crearSWFallback() {
-            const swCode = `
-                self.addEventListener('install', e => {
-                    e.waitUntil(self.skipWaiting());
-                });
-                self.addEventListener('activate', e => {
-                    e.waitUntil(self.clients.claim());
-                });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(
-                        fetch(e.request).catch(() => {
-                            return caches.match(e.request);
-                        })
-                    );
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl)
-                .then(() => console.log('✅ Service Worker fallback registrado'))
-                .catch(() => console.log('❌ Error SW fallback'));
         }
 
         // ============================================================
